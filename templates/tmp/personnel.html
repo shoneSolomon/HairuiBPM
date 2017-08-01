@@ -1,0 +1,64 @@
+<div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2><i class="fa fa-image"></i> {{ name }}</h2>
+          <div style="display: inline-block;margin-left: 20px">
+                <a type="button" class="btn btn-success btn-sm" href="/gitcadmin/personnel-{{ page_id }}/{{ library_id }}/edit/0">添加人员</a>
+                <a type="button" class="btn btn-success btn-sm" href="/gitcadmin/personnel-{{ page_id }}/{{ library_id }}/import.html">批量导入</a>
+          </div>
+          <ul class="nav navbar-right panel_toolbox">
+            <li style="margin-right: 20px;margin-top: 5px"><span>★ 默认按照姓名拼音升序排列</span></li>
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                  <i class="fa fa-unlink"></i></a>
+              <ul class="fa dropdown-menu" role="menu">
+                  <li style="padding: 10px ;width: 300px">API : {{ api }}</li>
+                  <li style="padding: 10px;color: #00A000">将以上代码发生前端生成！</li>
+              </ul>
+            </li>
+            <li><a class="close-link"><i class="fa fa-close"></i></a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content" style="display: block;">
+            <div class="col-lg-12 col-md-12 contents">
+
+                    <div class="ibox float-e-margins">
+
+                        <div class="ibox-content row ">
+                            {% for person in data_list %}
+                             <div class="person" style="width: 190px;padding-left: 10px;padding-right: 10px;position: relative;float: left;">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading name text-center">
+                                        {{ person.name }} <br>
+                                        {{ person.company }}
+                                    </div>
+                                    <div class="panel-body" style="padding: 15px;display: flex;justify-content: center;align-items: center;">
+                                    <a href="/gitcadmin/personnel-{{ page_id }}/{{ library_id }}/edit/{{ person.id }}">
+                                    {% if person.pic %}
+                                        <img src="{{ person.pic }}" style="width: {{ library_obj.width }};height: {{ library_obj.height }}">
+                                        {% else %}
+                                        <img src="\static\gitc\cx.jpg" style="width: {{ library_obj.width }};height: {{ library_obj.height }}">
+                                    {% endif %}
+                                        </a>
+                                    </div>
+                                    <div class="panel-footer text-center">
+                                        <a href="/gitcadmin/personnel-{{ page_id }}/{{ library_id }}/edit/{{ person.id }}">编辑</a>
+                                        <a href="javascript:void (0)" id="person{{ person.id }}" onclick="delperson({{ person.id }})">删除</a>
+                                    </div>
+                                </div>
+                             </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+
+			 </div>
+
+        </div>
+      </div>
+</div>
+

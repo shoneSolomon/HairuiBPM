@@ -1,0 +1,36 @@
+<div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2><i class="fa fa-image"></i> {{ name }}</h2>
+          <div style="display: inline-block;margin-left: 20px">
+              {% if data_list %}
+                  <a type="button" class="btn btn-success btn-sm" href="/gitcadmin/html-{{ page_id }}/{{ library_id }}/edit/{{ data_list.id }}">修改代码</a>
+                  {% else %}
+                  <a type="button" class="btn btn-success btn-sm addhtml" href="/gitcadmin/html-{{ page_id }}/{{ library_id }}/edit/0">添加代码</a>
+              {% endif %}
+            </div>
+          <ul class="nav navbar-right panel_toolbox">
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                  <i class="fa fa-unlink"></i></a>
+              <ul class="fa dropdown-menu" role="menu">
+                  <li style="padding: 10px ;width: 300px">API : {{ api }}</li>
+                  <li style="padding: 10px;color: #00A000">将以上代码发生前端生成！</li>
+              </ul>
+            </li>
+            <li><a class="close-link"><i class="fa fa-close"></i></a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content" style="display: block;">
+           {% if data_list %}
+            <div>
+            {{ data_list.html | safe }}
+            </div>
+           {% endif %}
+        </div>
+      </div>
+</div>
