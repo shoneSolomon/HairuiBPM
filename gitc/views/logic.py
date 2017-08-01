@@ -297,12 +297,14 @@ class ArticleView(BaseView):
                 info['content'] = article_obj.content
                 info['author'] = article_obj.author
                 info['amount'] = article_obj.amount
+                info['summary'] = article_obj.summary
             else:
                 title = '添加文章'
         obj = ArticleForm(initial=info)
         return render(request, 'tmp/articledit.html', locals())
 
     def post(self, request, page_id, library_id, cid):
+        print('post-->')
         ap_id = request.POST.get('ap_id')
         al_id = request.POST.get('al_id')
         self.error = []
@@ -345,14 +347,12 @@ class ArticleView(BaseView):
         obj = ArticleForm(request.POST, request.FILES)
         if obj.is_valid():
             if obj.cleaned_data.get('img'):
-                obj.cleaned_data['img'] = self.upimg(obj.cleaned_data['img'],status=1)
+                obj.cleaned_data['img'] = self.upimg(obj.cleaned_data['img'])
             else:
                 del obj.cleaned_data['img']
             ret = Article.objects.filter(id=cid).update(**obj.cleaned_data)
-            if ret:
-                status = True
-            else:
-                status = False
+            status = True if ret else  False
+
         return obj,status
 
 
@@ -445,3 +445,39 @@ def upload_kindeditor_img(request):
             if path:
                 ret['url'] = path
     return HttpResponse(json.dumps(ret))
+
+
+class DomainView(BaseView):
+
+    def get(self,request):
+        domain_list = Domain.objects.all()
+        obj = DomainForm()
+        return render(request,'admin/domain.html',locals())
+
+    def post(self,request):
+        domain_list = Domain.objects.all()
+        error = ''
+        cid = request.POST.get('cid')
+        if cid == '0':
+            obj = DomainForm(request.POST)
+            if obj.is_valid():
+                ret = Domain.objects.create(**obj.cleaned_data)
+                if not ret: error = '创建网站api失败!'
+            else:
+                error = '数据验证不通过'
+        else:
+            obj = DomainForm(request.POST,status=1)
+            if obj.is_valid():
+                ret = Domain.objects.filter(id=cid).update(**obj.cleaned_data)
+                if not ret: error = '更新网站api失败!'
+            else:
+                error = '数据验证不通过'
+        return render(request,'admin/domain.html',locals())
+
+
+class LibraryView(BaseView):
+
+    def get(self,request):
+        domain_list = Domain.objects.all()
+        obj = DomainForm()
+        return render(request,'admin/library.html',locals())

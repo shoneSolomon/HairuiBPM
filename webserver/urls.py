@@ -24,7 +24,6 @@ def error(request):
 urlpatterns = [
     url(r'^kingadmin/', admin.site.urls),
     url(r'^gitcadmin/', include('gitc.urls')),
-    url(r'^kyclubadmin/', include('kylinclub.urls')),
     url(r'^api/', include('api.urls')),
     url(r'', include('gitc.urls')),
 ]

@@ -3,7 +3,7 @@ from django.forms.forms import Form
 from django.forms import fields, widgets
 from django.core.exceptions import ValidationError
 from pypinyin import lazy_pinyin
-import uuid
+import uuid,re
 
 class UserInfoForm(Form):
     name = fields.CharField(required=True,max_length=64, min_length=1, strip=True,)
@@ -137,8 +137,16 @@ class ArticleForm(Form):
     def clean(self):
         summary = self.cleaned_data.get('summary')
         if not summary:
-            self.cleaned_data['summary'] = self.cleaned_data.get('content')[:100]
+            self.cleaned_data['summary'] = self.makedata(self.cleaned_data.get('content'))
         return self.cleaned_data
+
+    def makedata(self,data):
+        len_ = re.findall(r'<.+>',data)
+        for i in len_:
+            data = data.replace(i, '')
+        data = data.replace('&nbsp;','')
+        data = data.strip()
+        return data[:50]
 
     def __init__(self, *args, **kwargs):
         self.status = kwargs.get('status', 0)
@@ -246,5 +254,81 @@ class HtmlForm(Form):
         module = Html
 
 
+class DomainForm(Form):
+    name = fields.CharField(required=True,max_length=64, min_length=1, strip=True,
+                            widget=widgets.TextInput(
+                                attrs={'placeholder': "网站名称，必填项", 'class': "form-control col-md-7 col-xs-12"}
+                            ))
+    url = fields.URLField(required=True, max_length=64, min_length=1, strip=True,
+                            widget=widgets.URLInput(
+                                attrs={'placeholder': "网站链接，点击后可以跳转的页面。", 'class': "form-control col-md-7 col-xs-12"}
+                            ))
+    def clean(self):
+        '''验证数据是否重复'''
+        name = self.cleaned_data.get('name')
+        ret = Domain.objects.filter(name=name).count()
+        if self.status and ret:
+            del self.cleaned_data['name']
+        else:
+            if ret:
+                raise ValidationError('数据重复')
+        return self.cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        try:
+            self.status = int(kwargs.get('status', 0))
+        except Exception as e:
+            self.status = 0
+        if kwargs.get('status'):
+            del kwargs['status']
+        super(DomainForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        module = Domain
 
 
+class LibraryForm(Form):
+    ptl_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "hide"}))
+    plugin_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "hide"}))
+    weight = fields.CharField(required=True,initial=1,
+                            widget=widgets.NumberInput(attrs={'class': "form-control col-md-7 col-xs-12"}))
+    name = fields.CharField(required=True,max_length=64, min_length=1, strip=True,
+                            widget=widgets.TextInput(
+                                attrs={'placeholder': "模板名称", 'class': "form-control col-md-7 col-xs-12"}
+                            ))
+    width = fields.CharField(required=True,max_length=64, min_length=1, strip=True,initial='100%',
+                            widget=widgets.TextInput(
+                                attrs={'placeholder': "容许多宽？不填默认100%", 'class': "form-control col-md-7 col-xs-12"}
+                            ))
+    height = fields.CharField(required=True,max_length=64, min_length=1, strip=True,initial='100%',
+                            widget=widgets.TextInput(
+                                attrs={'placeholder': "容许多高？不填默认100%", 'class': "form-control col-md-7 col-xs-12"}
+                            ))
+    space =fields.CharField(required=True,max_length=64, min_length=1, strip=True,
+                            widget=widgets.TextInput(
+                                attrs={'placeholder': "容许最大上传kb", 'class': "form-control col-md-7 col-xs-12"}
+                            ))
+
+    def clean(self):
+        '''验证数据是否重复'''
+        name = self.cleaned_data.get('name')
+        ret = Domain.objects.filter(name=name).count()
+        if self.status and ret:
+            del self.cleaned_data['name']
+        else:
+            if ret:
+                raise ValidationError('数据重复')
+        return self.cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        try:
+            self.status = int(kwargs.get('status', 0))
+        except Exception as e:
+            self.status = 0
+        if kwargs.get('status'): del kwargs['status']
+        super(LibraryForm, self).__init__(*args, **kwargs)
+        self.fields['ptl_id'].widget.choices = PageTemplate.objects.all().values_list('id', 'name')
+        self.fields['plugin_id'].widget.choices = Plugin.objects.all().values_list('id', 'name')
+
+    class Meta:
+        module = Library

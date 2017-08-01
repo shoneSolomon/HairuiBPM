@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^login.html$', basics.loginview),
     url(r'^logout.html$', basics.logoutview),
     url(r'^changepwd.html$', basics.changepwd),
+    url(r'^domain/index.html$', logic.DomainView.as_view()),
+    url(r'^library/index.html$', logic.LibraryView.as_view()),
 
     url(r'^contact.html$', basics.contact),
     url(r'^u/del/(?P<cid>\d+)$', basics.delcontact),

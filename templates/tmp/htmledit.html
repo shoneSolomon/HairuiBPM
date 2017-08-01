@@ -94,37 +94,6 @@
       </div>
 </div>
 
-
-<div class="modal fade bs-example-modal-lg" tabindex="-1" id="myModal" role="dialog" aria-labelledby="myLargeModalLabel">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title" id="myModalLabel">页面模块展示</h4>
-        </div>
-        <div class="modal-body">
-            {% for domain in domain_list %}
-                {% for foo in domain.pagetemplate_set.all %}
-                    {% if forloop.counter == 1 %}
-                        <img cid="{{ foo.id }}" src="/static/upload/{{ foo.img }}" width="100%"  alt="">
-                        {% else %}
-                        <img cid="{{ foo.id }}" class="hide" src="/static/upload/{{ foo.img }}" width="100%"  alt="">
-                    {% endif %}
-
-                {% endfor %}
-            {% endfor %}
-
-
-        </div>
-
-    </div>
-  </div>
-</div>
-
-
-
 {% endblock %}
 
 {% block js %}
