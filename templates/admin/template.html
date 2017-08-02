@@ -16,7 +16,7 @@
       <div class="">
             <div class="page-title">
               <div class="title_left">
-                <h3>模板设置 <small>用于设置页面模板</small></h3>
+                <h3>模板设置 <small>用于设置可以创建的模板，创建页面会显示</small></h3>
                   {% csrf_token %}
               </div>
               <div class="clearfix"></div>
@@ -26,7 +26,7 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2>所有模板列表<small style="margin-left: 20px;">
-                                <a type="button" class="btn btn-success" href="/gitcadmin/page/add.html">添加模板</a></small></h2>
+                                <button type="button" class="btn btn-success" id="addmb" data-toggle="modal" data-target="#myModal">添加模板</button></small></h2>
                             <ul class="nav navbar-right panel_toolbox">
 
                             </ul>
@@ -50,14 +50,23 @@
                                           {% for pt in domain.pagetemplate_set.all %}
                                              <tr>
                                              {% if forloop.counter == 1 %}
-                                              <td rowspan="{{ nub }}" style="vertical-align: middle;">{{ domain.name }}</td>
+                                              <th rowspan="{{ nub }}" style="vertical-align: middle;">{{ domain.name }}</th>
                                              {% endif %}
                                                    <td>{{ pt.name }}</td>
-                                                   <td>{{ pt.img }}</td>
+                                                   <td><a href="/static/upload/{{ pt.img }}" target="_blank">点击预览</a></td>
                                                    <td>
-                                                      <button type="button" class="btn btn-primary myedit">编辑</button>
-                                                      <button type="button" class="btn btn-success hidden mysave" pp="{{ pt.id }}" cid="{{ foo.id }}">保存</button>
-                                                      <button type="button" class="btn btn-danger del" cid="{{ foo.id }}">删除</button>
+                                                      <a href="javascript:void (0);" class="myedit" domain_id="{{ domain.id }}" cid="{{ pt.id }}">
+                                                           <i class="fa fa-edit"></i> 编辑
+                                                           <span class="text-muted"></span>
+                                                      </a>
+                                                      <a href="javascript:void (0);" class="mysave hidden" cid="{{ pt.id }}">
+                                                           <i class="fa fa-save"></i> 保存
+                                                           <span class="text-muted"></span>
+                                                      </a>
+                                                      <a href="javascript:void (0);" class="del">
+                                                                    <i class="fa fa-close"></i> 删除
+                                                                    <span class="text-muted"></span>
+                                                      </a>
                                                    </td>
                                             </tr>
                                            {% endfor %}
@@ -68,10 +77,13 @@
                                 </table>
                             {% csrf_token %}
                             </div>
-                            {% if error %}
+                            {% if obj.errors %}
                              <div class="col-md-4 col-sm-4 col-xs-12">
-                                <div class="alert alert-danger" role="alert">
-                                    {{ error }}
+                                <div class="panel panel-danger">
+                                  <div class="panel-heading">错误提醒</div>
+                                  <div class="panel-body">
+                                    {{ obj.errors|safe }}
+                                  </div>
                                 </div>
                              </div>
                         {% endif %}
@@ -82,48 +94,71 @@
             </div>
       </div>
 </div>
+<div class="modal fade" tabindex="-1" id="myModal" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog" role="document">
+      <form method="post" id="myform" enctype="multipart/form-data">
+          {% csrf_token %}
+        <input type="hidden" name="cid" value="0" />
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">添加页面模板名称</h4>
+          </div>
+          <div class="modal-body" style="height: 50px;">
 
+              <div class="form-group">
+                <label class="col-sm-2 control-label" style="margin-top: 6px;">所属网站 *</label>
+                <div class="col-sm-10">
+                  {{ obj.domain_id }}
+                </div>
+              </div>
+              <div class="form-group" style="margin-top: 20px;">
+                <label class="col-sm-2 control-label" style="margin-top: 26px;">模板名称 *</label>
+                <div class="col-sm-10"  style="margin-top: 20px;">
+                  {{ obj.name }}
+                </div>
+              </div>
+              <div class="form-group" style="margin-top: 20px;">
+                <label class="col-sm-2 control-label" style="margin-top: 26px;">图片上传 *</label>
+                <div class="col-sm-10"  style="margin-top: 20px;">
+                  {{ obj.img }}
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer" style="display: block;margin-top: 125px;">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <input type="submit" value="保存" class="btn btn-primary">
+          </div>
+        </div><!-- /.modal-content -->
+      </form>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 {% endblock %}
 {% block js %}
 <script>
-    $('.myedit').click(function () {
-        $(this).addClass('hidden').next().removeClass('hidden');
-        var url = $(this).parent().prev().text();
-        $(this).parent().prev().attr('old',url)
-        $(this).parent().prev().html('<input class="form-control" name="url" type="text" value="'+ url +'">');
-        var name = $(this).parent().prev().prev().text();
-        $(this).parent().prev().prev().attr('old',name);
-        $(this).parent().prev().prev().html('<input class="form-control" name="name" type="text" value="'+ name +'">')
-
+    $('#addmb').click(function () {
+       document.getElementById("myform").reset();
+       $('input[name="cid"]').val('');
     });
-    $('.mysave').click(function () {
-        $(this).addClass('hidden').prev().removeClass('hidden');
-        var status = false;
-        var data = {};
-        data.url = $('input[name="url"]').val();
-        data.name = $('input[name="name"]').val();
-        $(this).parent().prev().text(data.url);
-        $(this).parent().prev().prev().text(data.name);
-        data.csrf = $('input[name="csrfmiddlewaretoken"]').val();
-        data.cid = $(this).attr('cid');
-        data.pp_id = $(this).attr('pp');
-        $.ajax({
-            url:'/gitcadmin/page/index.html',
-            type:'POST',
-            dataType:'JSON',
-            data:data,
-            success:function (arg) {
-                if(arg.status){
-                    $(this).parent().prev().prev().addClass('greed')
-                }else {
-                    $(this).parent().prev().prev().addClass('red')
-                }
-            }
-        })
 
-    })
+    $('.myedit').click(function () {
+        var domain_id = $(this).attr('domain_id');
+        var cid = $(this).attr('cid');
+        $('input[name="cid"]').val(cid);
+        var name = $(this).parent().prev().prev().text();
+        $('#id_domain_id').find('option').each(function () {
+            var k = $(this).val();
+            if (k == domain_id){
+                 $(this).attr('selected',true)
+            }else {
+                 $(this).attr('selected',false)
+            }
+        });
+        $('#id_name').val(name);
+        $('#myModal').modal('show');
+    });
 
 </script>
 {% endblock %}

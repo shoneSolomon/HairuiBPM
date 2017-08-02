@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from gitc.models import *
 from gitc.gform import *
 from gitc.pages import Pagination

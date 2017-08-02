@@ -3,6 +3,7 @@ from gitc.views.baseview import BaseView
 from gitc.views.utils import md5
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from gitc.models import *
 from gitc.gform import *
 import json
@@ -10,11 +11,12 @@ import json
 
 class Addpage(BaseView):
     '''添加页面'''
-
+    @method_decorator(login_required())
     def get(self, request):
         domain_list = Domain.objects.all()
         return render(request, 'admin/addpage.html', locals())
 
+    @method_decorator(login_required())
     def post(self, request):
         '''
         ajax请求,创建页面
@@ -37,6 +39,8 @@ class Addpage(BaseView):
 
 
 class UPageView(BaseView):
+
+    @method_decorator(login_required())
     def get(self, request, cid):
         domain_list = Domain.objects.all()
         obj = Page.objects.filter(id=cid).first()
@@ -46,6 +50,7 @@ class UPageView(BaseView):
 
 class ImgView(BaseView):
 
+    @method_decorator(login_required())
     def get(self, request, page_id, library_id, cid):
         domain_list = Domain.objects.all()
         info = {'ip_id': page_id, 'il_id': library_id}
@@ -72,6 +77,7 @@ class ImgView(BaseView):
         obj = ImgsForm(initial=info)
         return render(request, 'tmp/imgedit.html', locals())
 
+    @method_decorator(login_required())
     def post(self, request, page_id, library_id, cid):
         ip_id = request.POST.get('ip_id')
         il_id = request.POST.get('il_id')
@@ -125,6 +131,7 @@ class ImgView(BaseView):
 
 class PersonnelView(BaseView):
 
+    @method_decorator(login_required())
     def get(self, request, page_id, library_id, cid):
         domain_list = Domain.objects.all()
         info = {'ppl_id': page_id, 'pl_id': library_id}
@@ -153,6 +160,7 @@ class PersonnelView(BaseView):
         obj = PersonnelForm(initial=info)
         return render(request, 'tmp/personedit.html', locals())
 
+    @method_decorator(login_required())
     def post(self, request, page_id, library_id, cid):
         ppl_id = request.POST.get('ppl_id')
         pl_id = request.POST.get('pl_id')
@@ -207,6 +215,8 @@ class PersonnelView(BaseView):
 
 class ImportPerson(BaseView):
     '''导入人员信息处理函数'''
+
+    @method_decorator(login_required())
     def get(self,request,page_id,library_id):
         domain_list = Domain.objects.all()
         if page_id:
@@ -219,6 +229,7 @@ class ImportPerson(BaseView):
             return redirect('/gitcadmin/page/%s/index.html' % page_id)
         return render(request,'admin/importuser.html',locals())
 
+    @method_decorator(login_required())
     def post(self, request, page_id, library_id):
         domain_list = Domain.objects.all()
         data = []
@@ -231,7 +242,7 @@ class ImportPerson(BaseView):
             data = self.excel_to_dict(file)
         return render(request,'admin/importuser.html',locals())
 
-
+@login_required
 def PersonAddAjax(request):
     '''
     数据批量添加接口
@@ -253,7 +264,7 @@ def PersonAddAjax(request):
             data['msg'] = '数据验证失败'
     return HttpResponse(json.dumps(data))
 
-
+@login_required
 def PersonDelAjax(requset,cid):
     '''
     用户删除人员信息处理
@@ -275,7 +286,7 @@ def PersonDelAjax(requset,cid):
 
 
 class ArticleView(BaseView):
-
+    @method_decorator(login_required())
     def get(self, request, page_id, library_id, cid):
         domain_list = Domain.objects.all()
         info = {'ap_id': page_id, 'al_id': library_id}
@@ -303,6 +314,7 @@ class ArticleView(BaseView):
         obj = ArticleForm(initial=info)
         return render(request, 'tmp/articledit.html', locals())
 
+    @method_decorator(login_required())
     def post(self, request, page_id, library_id, cid):
         print('post-->')
         ap_id = request.POST.get('ap_id')
@@ -357,7 +369,7 @@ class ArticleView(BaseView):
 
 
 class HtmlView(BaseView):
-
+    @method_decorator(login_required())
     def get(self, request, page_id, library_id, cid):
         domain_list = Domain.objects.all()
         info = {'hp_id': page_id, 'hl_id': library_id}
@@ -382,6 +394,7 @@ class HtmlView(BaseView):
         obj = HtmlForm(initial=info)
         return render(request, 'tmp/htmledit.html', locals())
 
+    @method_decorator(login_required())
     def post(self, request, page_id, library_id, cid):
         hp_id = request.POST.get('hp_id')
         hl_id = request.POST.get('hl_id')
@@ -425,7 +438,7 @@ class HtmlView(BaseView):
             status = True if ret else False
         return obj,status
 
-
+@login_required
 def upload_kindeditor_img(request):
     '''
     文章的上传图片
@@ -448,12 +461,13 @@ def upload_kindeditor_img(request):
 
 
 class DomainView(BaseView):
-
+    @method_decorator(login_required())
     def get(self,request):
         domain_list = Domain.objects.all()
         obj = DomainForm()
         return render(request,'admin/domain.html',locals())
 
+    @method_decorator(login_required())
     def post(self,request):
         domain_list = Domain.objects.all()
         error = ''
@@ -476,13 +490,14 @@ class DomainView(BaseView):
 
 
 class LibraryView(BaseView):
-
+    @method_decorator(login_required())
     def get(self,request):
         domain_list = Domain.objects.all()
         pt_list = PageTemplate.objects.all()
         obj = LibraryForm()
         return render(request,'admin/library.html',locals())
 
+    @method_decorator(login_required())
     def post(self,request):
         data = {'status':False}
         obj = LibraryForm(request.POST)
@@ -493,13 +508,14 @@ class LibraryView(BaseView):
         return HttpResponse(json.dumps(data))
 
 class PageView(BaseView):
-
+    @method_decorator(login_required())
     def get(self,request):
         domain_list = Domain.objects.all()
         page_list = Page.objects.all()
         obj = DomainForm()
         return render(request,'admin/page.html',locals())
 
+    @method_decorator(login_required())
     def post(self,request):
         data = {'status':False}
         cid = request.POST.get('cid')
@@ -509,22 +525,29 @@ class PageView(BaseView):
             data['status'] = True if ret else False
         return HttpResponse(json.dumps(data))
 
-class TemplateView(BaseView):
 
+class TemplateView(BaseView):
+    @method_decorator(login_required())
     def get(self,request):
         domain_list = Domain.objects.all()
         page_list = Page.objects.all()
         obj = PageTemplateForm()
         return render(request,'admin/template.html',locals())
 
+    @method_decorator(login_required())
     def post(self,request):
-        data = {'status':False}
+        domain_list = Domain.objects.all()
+        page_list = Page.objects.all()
         cid = request.POST.get('cid')
-        obj = PageForm(request.POST)
+        obj = PageTemplateForm(request.POST, request.FILES,status=1 if cid else 0)
         if obj.is_valid():
-            ret = Page.objects.filter(id=cid).update(**obj.cleaned_data)
-            data['status'] = True if ret else False
-        return HttpResponse(json.dumps(data))
+            if obj.cleaned_data.get('img'):
+                obj.cleaned_data['img'] = self.upimg(obj.cleaned_data['img'])
+            if cid:
+                PageTemplate.objects.filter(id=cid).update(**obj.cleaned_data)
+            else:
+                PageTemplate.objects.create(**obj.cleaned_data)
+        return render(request,'admin/template.html',locals())
 
 
 

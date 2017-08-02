@@ -334,7 +334,7 @@ class LibraryForm(Form):
 
 
 class PageTemplateForm(Form):
-    domain_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "hide"}))
+    domain_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "form-control"}))
     name = fields.CharField(required=True,max_length=64, min_length=1, strip=True,
                             widget=widgets.TextInput(
                                 attrs={'placeholder': "模板名称", 'class': "form-control col-md-7 col-xs-12"}
@@ -350,7 +350,7 @@ class PageTemplateForm(Form):
         if kwargs.get('status'):
             del kwargs['status']
         super(PageTemplateForm, self).__init__(*args, **kwargs)
-        self.fields['domain_id'].widget.choices = Page.objects.all().values_list('id', 'name')
+        self.fields['domain_id'].widget.choices = Domain.objects.all().values_list('id', 'name')
 
     def clean(self):
         '''验证数据是否重复 1是修改 0是创建'''
@@ -365,3 +365,4 @@ class PageTemplateForm(Form):
 
     class Meta:
         module = PageTemplate
+

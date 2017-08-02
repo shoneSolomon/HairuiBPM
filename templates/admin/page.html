@@ -26,7 +26,7 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2>所有页面列表<small style="margin-left: 20px;">
-                                <a type="button" class="btn btn-success" href="/gitcadmin/page/add.html">添加网站</a></small></h2>
+                                <a type="button" class="btn btn-success" href="/gitcadmin/page/add.html">添加页面</a></small></h2>
                             <ul class="nav navbar-right panel_toolbox">
 
                             </ul>
@@ -97,7 +97,7 @@
     $('.myedit').click(function () {
         $(this).addClass('hidden').next().removeClass('hidden');
         var url = $(this).parent().prev().text();
-        $(this).parent().prev().attr('old',url)
+        $(this).parent().prev().attr('old',url);
         $(this).parent().prev().html('<input class="form-control" name="url" type="text" value="'+ url +'">');
         var name = $(this).parent().prev().prev().text();
         $(this).parent().prev().prev().attr('old',name);
@@ -130,6 +130,5 @@
         })
 
     })
-
 </script>
 {% endblock %}
