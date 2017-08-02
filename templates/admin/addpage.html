@@ -30,7 +30,8 @@
                                   <div class="form-group">
                                     <label class="col-sm-4 control-label">选择模板</label>
                                     <div class="col-sm-8">
-                                      <select class="form-control" id="selectpp" name="pp_id">
+                                    {% if request.method == 'GET' %}
+                                        <select class="form-control" id="selectpp" name="pp_id">
                                           {% for dom in domain_list %}
                                               <optgroup label="{{ dom.name }}">
                                               {% for mb in dom.pagetemplate_set.all %}
@@ -39,6 +40,10 @@
                                               </optgroup>
                                           {% endfor %}
                                         </select>
+                                        {% else %}
+                                        <input type="hidden" name="cid" value="{{ cid }}">
+                                    {% endif %}
+
                                     </div>
                                   </div>
                                   <div class="form-group">

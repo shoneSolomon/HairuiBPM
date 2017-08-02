@@ -2,7 +2,7 @@ from django.template import Library as li
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
 from webserver.settings import APIURL
-from gitc.models import Imgs, Video, Personnel, Article, Html,Library,Page
+from gitc.models import *
 
 register = li()
 
@@ -59,3 +59,15 @@ def bt(meet):
     nub = Page.objects.filter(pp__domain=meet).count()
     html = html % meet.name if nub else ''
     return mark_safe(html)
+
+@register.simple_tag
+def domain_page(obj):
+    return Page.objects.filter(pp__domain=obj).count()
+
+@register.simple_tag
+def domain_tp(obj):
+    return PageTemplate.objects.filter(domain=obj).count()
+
+@register.simple_tag
+def getl_to_tp(obj):
+    return obj.ptl_set.all().count()

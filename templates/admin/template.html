@@ -1,0 +1,129 @@
+{% extends 'index.html' %}
+{% load maketemplates %}
+{% block title %}模板管理{% endblock %}
+
+{% block head %}{% endblock %}
+{% block css %}
+<style>
+    th{vertical-align: middle!important;text-align: center}
+    td{vertical-align: middle!important;text-align: center}
+    .red{color: red;}
+    .green{color: green;}
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+      <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>模板设置 <small>用于设置页面模板</small></h3>
+                  {% csrf_token %}
+              </div>
+              <div class="clearfix"></div>
+              <div class="row">
+                <div class="clearfix"></div>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>所有模板列表<small style="margin-left: 20px;">
+                                <a type="button" class="btn btn-success" href="/gitcadmin/page/add.html">添加模板</a></small></h2>
+                            <ul class="nav navbar-right panel_toolbox">
+
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="col-md-8 col-sm-8 col-xs-12">
+                                <table class="table table-striped table-bordered dataTable no-footer">
+                                      <thead>
+                                        <tr>
+                                          <th>所属网站</th>
+                                          <th>模板名称</th>
+                                          <th>模板图片</th>
+                                          <th>操作</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                      {% for domain in domain_list %}
+                                          {% domain_tp domain as nub %}
+                                          {% if nub > 0 %}
+                                          {% for pt in domain.pagetemplate_set.all %}
+                                             <tr>
+                                             {% if forloop.counter == 1 %}
+                                              <td rowspan="{{ nub }}" style="vertical-align: middle;">{{ domain.name }}</td>
+                                             {% endif %}
+                                                   <td>{{ pt.name }}</td>
+                                                   <td>{{ pt.img }}</td>
+                                                   <td>
+                                                      <button type="button" class="btn btn-primary myedit">编辑</button>
+                                                      <button type="button" class="btn btn-success hidden mysave" pp="{{ pt.id }}" cid="{{ foo.id }}">保存</button>
+                                                      <button type="button" class="btn btn-danger del" cid="{{ foo.id }}">删除</button>
+                                                   </td>
+                                            </tr>
+                                           {% endfor %}
+                                          {% endif %}
+                                      {% endfor %}
+                                      </tbody>
+
+                                </table>
+                            {% csrf_token %}
+                            </div>
+                            {% if error %}
+                             <div class="col-md-4 col-sm-4 col-xs-12">
+                                <div class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                             </div>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+      </div>
+</div>
+
+
+
+{% endblock %}
+{% block js %}
+<script>
+    $('.myedit').click(function () {
+        $(this).addClass('hidden').next().removeClass('hidden');
+        var url = $(this).parent().prev().text();
+        $(this).parent().prev().attr('old',url)
+        $(this).parent().prev().html('<input class="form-control" name="url" type="text" value="'+ url +'">');
+        var name = $(this).parent().prev().prev().text();
+        $(this).parent().prev().prev().attr('old',name);
+        $(this).parent().prev().prev().html('<input class="form-control" name="name" type="text" value="'+ name +'">')
+
+    });
+    $('.mysave').click(function () {
+        $(this).addClass('hidden').prev().removeClass('hidden');
+        var status = false;
+        var data = {};
+        data.url = $('input[name="url"]').val();
+        data.name = $('input[name="name"]').val();
+        $(this).parent().prev().text(data.url);
+        $(this).parent().prev().prev().text(data.name);
+        data.csrf = $('input[name="csrfmiddlewaretoken"]').val();
+        data.cid = $(this).attr('cid');
+        data.pp_id = $(this).attr('pp');
+        $.ajax({
+            url:'/gitcadmin/page/index.html',
+            type:'POST',
+            dataType:'JSON',
+            data:data,
+            success:function (arg) {
+                if(arg.status){
+                    $(this).parent().prev().prev().addClass('greed')
+                }else {
+                    $(this).parent().prev().prev().addClass('red')
+                }
+            }
+        })
+
+    })
+
+</script>
+{% endblock %}

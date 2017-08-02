@@ -141,12 +141,13 @@ class ArticleForm(Form):
         return self.cleaned_data
 
     def makedata(self,data):
+        '''处理内容转换成简介'''
         len_ = re.findall(r'<.+>',data)
         for i in len_:
             data = data.replace(i, '')
         data = data.replace('&nbsp;','')
         data = data.strip()
-        return data[:50]
+        return data[:200]
 
     def __init__(self, *args, **kwargs):
         self.status = kwargs.get('status', 0)
@@ -248,8 +249,6 @@ class HtmlForm(Form):
         self.fields['hp_id'].widget.choices = Page.objects.all().values_list('id', 'name')
         self.fields['hl_id'].widget.choices = Library.objects.all().values_list('id', 'name')
 
-
-
     class Meta:
         module = Html
 
@@ -288,10 +287,10 @@ class DomainForm(Form):
 
 
 class LibraryForm(Form):
-    ptl_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "hide"}))
-    plugin_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "hide"}))
-    weight = fields.CharField(required=True,initial=1,
-                            widget=widgets.NumberInput(attrs={'class': "form-control col-md-7 col-xs-12"}))
+    ptl_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "form-control"}))
+    plugin_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "form-control"}))
+    weight = fields.CharField(required=False,initial=1,
+                            widget=widgets.NumberInput(attrs={'class': "form-control col-md-6 col-xs-6"}))
     name = fields.CharField(required=True,max_length=64, min_length=1, strip=True,
                             widget=widgets.TextInput(
                                 attrs={'placeholder': "模板名称", 'class': "form-control col-md-7 col-xs-12"}
@@ -306,7 +305,7 @@ class LibraryForm(Form):
                             ))
     space =fields.CharField(required=True,max_length=64, min_length=1, strip=True,
                             widget=widgets.TextInput(
-                                attrs={'placeholder': "容许最大上传kb", 'class': "form-control col-md-7 col-xs-12"}
+                                attrs={'placeholder': "容许最大上传kb", 'class': "form-control col-md-6 col-xs-6"}
                             ))
 
     def clean(self):
@@ -332,3 +331,37 @@ class LibraryForm(Form):
 
     class Meta:
         module = Library
+
+
+class PageTemplateForm(Form):
+    domain_id = fields.CharField(required=True, widget=widgets.Select(attrs={'class': "hide"}))
+    name = fields.CharField(required=True,max_length=64, min_length=1, strip=True,
+                            widget=widgets.TextInput(
+                                attrs={'placeholder': "模板名称", 'class': "form-control col-md-7 col-xs-12"}
+                            ))
+    img = fields.ImageField(required=False,
+                            widget=widgets.FileInput(attrs={'class': "form-control col-md-7 col-xs-12", }))
+
+    def __init__(self, *args, **kwargs):
+        try:
+            self.status = int(kwargs.get('status', 0))
+        except Exception as e:
+            self.status = 0
+        if kwargs.get('status'):
+            del kwargs['status']
+        super(PageTemplateForm, self).__init__(*args, **kwargs)
+        self.fields['domain_id'].widget.choices = Page.objects.all().values_list('id', 'name')
+
+    def clean(self):
+        '''验证数据是否重复 1是修改 0是创建'''
+        if self.status:
+            if not self.cleaned_data.get('img'):
+                del self.cleaned_data['img']
+            return self.cleaned_data
+        else:#创建数据
+            if not self.cleaned_data.get('img'):
+                raise ValidationError('图片不能为空')
+        return self.cleaned_data
+
+    class Meta:
+        module = PageTemplate

@@ -36,7 +36,7 @@ class Addpage(BaseView):
         return HttpResponse(json.dumps(data))
 
 
-class PageView(BaseView):
+class UPageView(BaseView):
     def get(self, request, cid):
         domain_list = Domain.objects.all()
         obj = Page.objects.filter(id=cid).first()
@@ -479,5 +479,54 @@ class LibraryView(BaseView):
 
     def get(self,request):
         domain_list = Domain.objects.all()
-        obj = DomainForm()
+        pt_list = PageTemplate.objects.all()
+        obj = LibraryForm()
         return render(request,'admin/library.html',locals())
+
+    def post(self,request):
+        data = {'status':False}
+        obj = LibraryForm(request.POST)
+        cid = request.POST.get('cid')
+        if obj.is_valid():
+            ret = Library.objects.filter(id=cid).update(**obj.cleaned_data)
+            data['status'] = True if ret else False
+        return HttpResponse(json.dumps(data))
+
+class PageView(BaseView):
+
+    def get(self,request):
+        domain_list = Domain.objects.all()
+        page_list = Page.objects.all()
+        obj = DomainForm()
+        return render(request,'admin/page.html',locals())
+
+    def post(self,request):
+        data = {'status':False}
+        cid = request.POST.get('cid')
+        obj = PageForm(request.POST)
+        if obj.is_valid():
+            ret = Page.objects.filter(id=cid).update(**obj.cleaned_data)
+            data['status'] = True if ret else False
+        return HttpResponse(json.dumps(data))
+
+class TemplateView(BaseView):
+
+    def get(self,request):
+        domain_list = Domain.objects.all()
+        page_list = Page.objects.all()
+        obj = PageTemplateForm()
+        return render(request,'admin/template.html',locals())
+
+    def post(self,request):
+        data = {'status':False}
+        cid = request.POST.get('cid')
+        obj = PageForm(request.POST)
+        if obj.is_valid():
+            ret = Page.objects.filter(id=cid).update(**obj.cleaned_data)
+            data['status'] = True if ret else False
+        return HttpResponse(json.dumps(data))
+
+
+
+
+

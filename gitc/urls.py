@@ -23,13 +23,15 @@ urlpatterns = [
     url(r'^changepwd.html$', basics.changepwd),
     url(r'^domain/index.html$', logic.DomainView.as_view()),
     url(r'^library/index.html$', logic.LibraryView.as_view()),
+    url(r'^page/index.html$', logic.PageView.as_view()),
+    url(r'^template/index.html$', logic.TemplateView.as_view()),
 
     url(r'^contact.html$', basics.contact),
     url(r'^u/del/(?P<cid>\d+)$', basics.delcontact),
 
     url(r'^page/add.html$', logic.Addpage.as_view()),
 
-    url(r'^page/(?P<cid>\d+)/index.html$', logic.PageView.as_view()),
+    url(r'^page/(?P<cid>\d+)/index.html$', logic.UPageView.as_view()),
 
     url(r'^img-(?P<page_id>\d+)/(?P<library_id>\d+)/edit/(?P<cid>\d+)$', logic.ImgView.as_view()),
     url(r'^article-(?P<page_id>\d+)/(?P<library_id>\d+)/edit/(?P<cid>\d+)$', logic.ArticleView.as_view()),
